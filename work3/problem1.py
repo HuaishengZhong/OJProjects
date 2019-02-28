@@ -21,19 +21,52 @@ Output
 """
 
 
-from scipy.optimize import linear_sum_assignment
-import numpy as np
+import itertools
 
-# 2 1 6,1 2 2,1 3 7,1 4 8,1 1 9,2 2 4,2 3 3,2 4 7,3 1 5,3 2 8,3 3 1,3 4 8,4 1 7,4 2 6,4 3 9,4 4 4
-num_cases = int(input())
-for i in range(num_cases):
+
+def per(n):
+    lis = [i for i in range(n)]
+    res = []
+    for r in itertools.permutations(lis, n):
+        res.append(r)
+    return res
+
+
+def f(m, n):
+    res = per(n)
+    s = []
+    for r in res:
+        c = 0
+        for i in range(n):
+            c += m[i][r[i]]
+        s.append(c)
+    min_v = min(s)
+    result = []
+    for i in range(len(s)):
+        if min_v == s[i]:
+            result.append(list(map(lambda x: x + 1, res[i])))
+
+    return result
+
+
+def g(n):
+    s = ''
+    for i in range(n):
+        s += 'x[' + str(i) + ']' + ','
+    return s[:len(s) - 1]
+
+
+cases = int(input())
+for _ in range(cases):
     n = int(input())
-    cost = np.zeros(shape=(n, n), dtype=int)
-    s = input().split(',')
-    for li in s:
-        x = int(li[0])
-        y = int(li[2])
-        data = int(li[4])
-        cost[x - 1][y - 1] = data
-    row_ind, col_ind = linear_sum_assignment(cost)
-    print(" ".join(str(i + 1) for i in col_ind))
+    m = [[0 for _ in range(n)] for _ in range(n)]
+    nn = input().strip().split(',')
+    for p in nn:
+        people, task, value = p.split()
+        m[int(people) - 1][int(task) - 1] = int(value)
+    res = f(m, n)
+    res = sorted(res, key=lambda x: (eval(g(n))), reverse=True)
+    s = ''
+    for r in res:
+        s += ' '.join(list(map(str, r))) + ','
+    print(s[:len(s) - 1])
